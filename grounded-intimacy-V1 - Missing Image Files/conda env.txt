@@ -1,0 +1,2 @@
+conda create -n skyesite python=3.11 -y
+conda activate skyesite
