@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Warning and Waiver | Grounded Intimacy</title>
+    <style>
+        body { font-family: "Times New Roman", Times, serif; line-height: 1.5; color: #333; max-width: 800px; margin: 0 auto; padding: 40px; }
+        h1 { text-align: center; text-transform: uppercase; font-size: 24px; margin-bottom: 40px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        h2 { font-size: 16px; text-transform: uppercase; margin-top: 30px; }
+        p { margin-bottom: 15px; }
+        .box { border: 1px solid #ccc; padding: 15px; background: #f9f9f9; font-size: 14px; margin: 20px 0; }
+        
+        /* Functional Form Styling */
+        .form-container { margin-top: 40px; border-top: 2px solid #333; padding-top: 20px; }
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
+        input[type="text"], input[type="email"] { width: 100%; padding: 10px; border: 1px solid #ccc; font-family: inherit; }
+        button { background: #2d4a41; color: white; padding: 15px 30px; border: none; cursor: pointer; font-size: 16px; text-transform: uppercase; width: 100%; }
+        button:disabled { background: #ccc; }
+        #status { margin-top: 20px; text-align: center; font-weight: bold; }
+        
+        @media print { .form-container, button { display: none; } body { padding: 0; } }
+    </style>
+</head>
+<body>
+
+    <h1>Risk Warning & Acknowledgement</h1>
+    <p><strong>Provider:</strong> Grounded Intimacy (The "Supplier")</p>
+    <p><strong>Activity:</strong> Equine Assisted Learning and associated ground-work activities.</p>
+
+    <h2>Risk Warning (Civil Liability Act 2002)</h2>
+    <p>Participating in activities involving horses carries inherent risks. Horses are large, unpredictable animals that act on instinct. They can be easily frightened or panicked and may react without warning.</p>
+    
+    <div class="box">
+        <strong>Specific Risks include, but are not limited to:</strong>
+        <ul>
+            <li>Biting, kicking, or striking.</li>
+            <li>Trampling or crushing (e.g., if a horse steps on a foot).</li>
+            <li>Sudden movements (spooking, shying, rearing, or bolting).</li>
+            <li>Falling or losing balance due to uneven ground in the paddock.</li>
+        </ul>
+    </div>
+
+    <h2>Acknowledgement of Physical Capacity</h2>
+    <p>I declare that I am physically capable of participating in this activity. I do not have any medical condition that would make it unsafe for me to be in the proximity of horses or walking on uneven terrain, other than those I have disclosed to the Supplier in writing.</p>
+
+    <h2>Waiver</h2>
+    <p>By submitting this form, I acknowledge that I have read this warning and participate in the activity voluntarily and at my own risk.</p>
+
+    <div class="form-container">
+        <form id="waiverForm">
+            <div class="input-group">
+                <label for="fullName">Participant Full Name (Print)</label>
+                <input type="text" id="fullName" required placeholder="Enter your full name">
+            </div>
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required placeholder="you@example.com">
+            </div>
+            <button type="submit" id="submitBtn">Sign & Submit Digitally</button>
+        </form>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('waiverForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const status = document.getElementById('status');
+            
+            btn.disabled = true;
+            status.textContent = "Recording signature...";
+
+            const payload = {
+                name: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                timestamp: new Date().toLocaleString('en-AU', { timeZone: 'Australia/Melbourne' })
+            };
+
+            try {
+                const response = await fetch('/api/sign-waiver', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    status.style.color = "green";
+                    status.textContent = "Waiver signed and recorded. Redirecting to booking...";
+                    setTimeout(() => window.location.href = "/", 2000);
+                } else {
+                    const err = await response.json();
+                    throw new Error(err.error || "Submission failed");
+                }
+            } catch (err) {
+                status.style.color = "red";
+                status.textContent = "Error: " + err.message;
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
